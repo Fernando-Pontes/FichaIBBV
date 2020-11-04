@@ -26,7 +26,8 @@ namespace FichaIbbv
             services.AddSingleton<MainWindow>()
                .AddScoped<IMembrosService, MembrosService>()
                .AddScoped<IEnderecosService, EnderecosService>()
-               .AddScoped<INaoMembroService, NaoMembroService>();
+               .AddScoped<INaoMembroService, NaoMembroService>()
+               .AddScoped<IMembros_NaoMembrosService, Membros_NaoMembrosService>();
         }
 
         private void OnStartup(object sender, StartupEventArgs e)

@@ -4,6 +4,7 @@ using FichaIBBV.Services.Abstract;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Text.Json.Serialization;
 using System.Windows;
@@ -22,16 +23,19 @@ namespace FichaIbbv
         private IMembrosService _membrosService;
         private IEnderecosService _enderecosService;
         private INaoMembroService _naoMembroService;
+        private IMembros_NaoMembrosService _membros_NaoMembrosService;
 
         private List<NaoMembrosModel> lstNaoMembros = new List<NaoMembrosModel>();
 
         public MainWindow(IMembrosService membrosService,
             IEnderecosService enderecosService,
-            INaoMembroService naoMembroService)
+            INaoMembroService naoMembroService,
+            IMembros_NaoMembrosService membros_NaoMembrosService)
         {
             _membrosService = membrosService;
             _enderecosService = enderecosService;
             _naoMembroService = naoMembroService;
+            _membros_NaoMembrosService = membros_NaoMembrosService;
 
             InitializeComponent();
 
@@ -41,7 +45,7 @@ namespace FichaIbbv
             inclusao_cmbEnderecos.ItemsSource = null;
             inclusao_cmbEnderecos.ItemsSource = lstEnd;
 
-            inclusao_naoMembros_dgNaoMembros.ItemsSource = this.lstNaoMembros;
+            inclusao_naoMembros_dgNaoMembros.ItemsSource = _naoMembroService.GetAll().ToList<NaoMembrosModel>();
         }
 
         private void dgMembros_SelectionChanged(object sender, System.Windows.Controls.SelectionChangedEventArgs e)
@@ -97,11 +101,55 @@ namespace FichaIbbv
                 textBox.Clear();
             }
 
+            foreach(TextBox textBox in FindInVisualTreeDown(this.inclusao_dados, typeof(TextBox)))
+            {
+                textBox.Clear();
+            }
+
+            foreach (TextBox textBox in FindInVisualTreeDown(this.inclusao_endereco, typeof(TextBox)))
+            {
+                textBox.Clear();
+            }
+
+            foreach (TextBox textBox in FindInVisualTreeDown(this.inclusao_nao_membros, typeof(TextBox)))
+            {
+                textBox.Clear();
+            }
+
             foreach (DatePicker datePicker in FindInVisualTreeDown(this.dados, typeof(DatePicker)))
             {
                 DateTime? emptyDate = null;
                 datePicker.SelectedDate = emptyDate;
                 datePicker.Text = "Selecione uma data";
+            }
+
+            foreach (DatePicker datePicker in FindInVisualTreeDown(this.inclusao_dados, typeof(DatePicker)))
+            {
+                DateTime? emptyDate = null;
+                datePicker.SelectedDate = emptyDate;
+                datePicker.Text = "Selecione uma data";
+            }
+
+            foreach (DatePicker datePicker in FindInVisualTreeDown(this.inclusao_nao_membros, typeof(DatePicker)))
+            {
+                DateTime? emptyDate = null;
+                datePicker.SelectedDate = emptyDate;
+                datePicker.Text = "Selecione uma data";
+            }
+
+            foreach (CheckBox checkBox in FindInVisualTreeDown(this.inclusao_endereco, typeof(CheckBox)))
+            {
+                checkBox.IsChecked = false;
+            }
+
+            foreach (CheckBox checkBox in FindInVisualTreeDown(this.inclusao_nao_membros, typeof(CheckBox)))
+            {
+                checkBox.IsChecked = false;
+            }
+
+            foreach (ComboBox combo in FindInVisualTreeDown(this.inclusao_endereco,typeof(ComboBox)))
+            {
+                combo.SelectedIndex = -1;
             }
         }
 
@@ -141,11 +189,80 @@ namespace FichaIbbv
         {
             MembrosModel novoMembro = new MembrosModel();
 
-            novoMembro.DataBatismo = inclusao_dtBatismo.SelectedDate.Value;
+            if (inclusao_dtBatismo.SelectedDate != null)
+            {
+                novoMembro.DataBatismo = inclusao_dtBatismo.SelectedDate.Value;
+            }
             novoMembro.DataNasc = inclusao_dtNasc.SelectedDate.Value;
             novoMembro.Email = inclusao_txtEmail.Text;
-            novoMembro.Endereco.Bairro = inclusao_txtBairro.Text;
-            novoMembro.Endereco.Cep = inclusao_txtCep.Text;
+            novoMembro.Nome = inclusao_txtNome.Text;
+            novoMembro.Rg = inclusao_txtRG.Text;
+            novoMembro.Telefone = inclusao_txtTel.Text;
+            if (inclusao_chkEndereco.IsChecked.Value)
+            {
+                novoMembro.Endereco = new EnderecosModel();
+                novoMembro.Endereco.Bairro = inclusao_txtBairro.Text;
+                novoMembro.Endereco.Cep = inclusao_txtCep.Text;
+                novoMembro.Endereco.Logradouro = inclusao_txtEndereco.Text;
+                novoMembro.Endereco.Localidade = inclusao_txtLocalidade.Text;
+                novoMembro.Endereco.Numero = inclusao_txtNumero.Text;
+                novoMembro.Endereco.Complemento = inclusao_txtComplemento.Text;
+                novoMembro.Endereco.Uf = inclusao_txtUf.Text;
+            }
+            else
+            {
+                novoMembro.IdEnderecos = ((EnderecosModel)inclusao_cmbEnderecos.SelectedItem).IdEnderecos;
+            }
+
+
+            if (inclusao_ChkNaoMembro.IsChecked.Value)
+            {
+                foreach (NaoMembrosModel nm in lstNaoMembros)
+                {
+                    nm.IdNao_Membros = _naoMembroService.Insert(nm);
+                }
+            }
+
+            novoMembro.IdMembros = _membrosService.Insert(novoMembro);
+
+            if (lstNaoMembros.Count > 0)
+            {
+                foreach (NaoMembrosModel nm in lstNaoMembros)
+                {
+                    Membros_NaoMembrosModel m = new Membros_NaoMembrosModel()
+                    {
+                        IdMembros = novoMembro.IdMembros,
+                        IdNao_Membros = nm.IdNao_Membros
+                    };
+
+                    _membros_NaoMembrosService.Insert(m);
+                };
+            }
+            else
+            {
+                if(inclusao_naoMembros_dgNaoMembros.SelectedItems.Count > 0)
+                {
+                    foreach (NaoMembrosModel nm in inclusao_naoMembros_dgNaoMembros.SelectedItems)
+                    {
+                        Membros_NaoMembrosModel m = new Membros_NaoMembrosModel()
+                        {
+                            IdMembros = novoMembro.IdMembros,
+                            IdNao_Membros = nm.IdNao_Membros
+                        };
+
+                        _membros_NaoMembrosService.Insert(m);
+                    }
+                }
+            }
+            LimparForm();
+
+            dgMembros.ItemsSource = _membrosService.GetAll();
+            dgMembros.Items.Refresh();
+
+            inclusao_naoMembros_dgNaoMembros.ItemsSource = _naoMembroService.GetAll();
+            inclusao_naoMembros_dgNaoMembros.Items.Refresh();
+
+            tbCtrl.SelectedIndex = 0;
         }
 
         private void inclusao_txtCep_LostFocus(object sender, RoutedEventArgs e)
@@ -225,7 +342,37 @@ namespace FichaIbbv
 
             lstNaoMembros.Add(naoMembros);
 
+            inclusao_naoMembros_dgNaoMembros.ItemsSource = lstNaoMembros;
             inclusao_naoMembros_dgNaoMembros.Items.Refresh();
+        }
+
+        private void inclusao_txtPesquisarNaoMembro_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox txtSender = (TextBox)sender;
+            inclusao_naoMembros_dgNaoMembros.ItemsSource = _naoMembroService.GetByNome(txtSender.Text);
+        }
+
+
+        private void inclusao_ChkNaoMembro_Click(object sender, RoutedEventArgs e)
+        {
+            CheckBox chkSender = (CheckBox)sender;
+
+            inclusao_txtPesquisarNaoMembro.IsEnabled = chkSender.IsChecked.Value;
+
+            inclusao_naoMembro_txtNome.IsEnabled = chkSender.IsChecked.Value;
+            inclusao_naoMembros_dpDtNasc.IsEnabled = chkSender.IsChecked.Value;
+
+            if (!chkSender.IsChecked.Value)
+            {
+                inclusao_naoMembros_dgNaoMembros.ItemsSource = _naoMembroService.GetAll();
+                inclusao_naoMembros_dgNaoMembros.IsEnabled = true;
+            }
+            else
+            {
+                inclusao_naoMembros_dgNaoMembros.ItemsSource = lstNaoMembros;
+                inclusao_naoMembros_dgNaoMembros.IsEnabled = false;
+
+            }
         }
     }
 }

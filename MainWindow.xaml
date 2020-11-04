@@ -8,13 +8,9 @@
         mc:Ignorable="d"
         Title="Ficha IBBV" Height="771" Width="900">
     <Grid>
-        <TabControl>
+        <TabControl x:Name="tbCtrl">
             <TabItem Header="Consulta de Membros" Name="tab1">
                 <Grid Background="#FFE5E5E5">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="38*"/>
-                        <ColumnDefinition Width="111*"/>
-                    </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="20*"/>
                         <RowDefinition Height="12*"/>
@@ -42,7 +38,7 @@
                     <GroupBox Header="Dados do Membro" x:Name="dados" Margin="10,10,10,0" Height="100" VerticalAlignment="Top" Grid.Row="1" Grid.ColumnSpan="2">
                         <Grid>
                             <Label Content="Nome:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Grid.Row="1" Height="26" Width="45"/>
-                            <TextBox HorizontalAlignment="Left" Margin="57,15,0,0" x:Name="txtNome" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Height="18"/>
+                            <TextBox HorizontalAlignment="Left" Margin="55,15,0,0" x:Name="txtNome" TextWrapping="Wrap" VerticalAlignment="Top" Width="300" Height="18"/>
                             <DatePicker HorizontalAlignment="Left" x:Name="dtNasc" Margin="492,10,0,0" VerticalAlignment="Top" IsTodayHighlighted="False" Text="Data De Nascimento" Height="24" Width="138" IsEnabled="False" />
                             <Label Content="Data de Nascimento:" HorizontalAlignment="Left" Margin="370,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.605,-0.531" Grid.Row="1" Height="26" Width="120"/>
                             <Label Content="Telefone:" HorizontalAlignment="Left" Margin="642,10,0,0" VerticalAlignment="Top" Height="26" Width="57"/>
@@ -104,11 +100,11 @@
                             <DatePicker HorizontalAlignment="Left" x:Name="inclusao_dtNasc" Margin="492,10,0,0" VerticalAlignment="Top" IsTodayHighlighted="true" Text="Data De Nascimento" Height="24" Width="138" IsEnabled="True" />
                             <Label Content="Data de Nascimento:" HorizontalAlignment="Left" Margin="370,10,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.605,-0.531" Grid.Row="1" Height="26" Width="120"/>
                             <Label Content="Telefone:" HorizontalAlignment="Left" Margin="642,10,0,0" VerticalAlignment="Top" Height="26" Width="57"/>
-                            <TextBox x:Name="inclusao_txtTel" Margin="700,15,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="18" />
+                            <TextBox x:Name="inclusao_txtTel" Margin="700,15,10,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="18" MaxLength="15" />
                             <Label Content="E-mail:" HorizontalAlignment="Left" Margin="10,35,0,0" VerticalAlignment="Top" Height="26" Width="46"/>
                             <TextBox HorizontalAlignment="Left" Margin="55,41,0,0" x:Name="inclusao_txtEmail" TextWrapping="Wrap" VerticalAlignment="Top" Width="205" Height="18"/>
                             <Label Content="RG:" HorizontalAlignment="Left" Margin="277,35,0,0" VerticalAlignment="Top" Height="26" Width="28"/>
-                            <TextBox HorizontalAlignment="Left" Margin="310,41,0,0" x:Name="inclusao_txtRG" TextWrapping="Wrap" VerticalAlignment="Top" Width="97" Height="18"/>
+                            <TextBox HorizontalAlignment="Left" Margin="310,41,0,0" x:Name="inclusao_txtRG" TextWrapping="Wrap" VerticalAlignment="Top" Width="97" Height="18" MaxLength="7"/>
                             <Label Content="Data de Batismo:" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="410,35,0,0"/>
                             <DatePicker x:Name="inclusao_dtBatismo" VerticalAlignment="Top" HorizontalAlignment="Left" Margin="510,38,0,0" IsTodayHighlighted="True" IsEnabled="True"/>
                         </Grid>
@@ -132,27 +128,55 @@
                             <ComboBox Name="inclusao_cmbEnderecos" HorizontalAlignment="Left" Margin="171,12,0,0" VerticalAlignment="Top" Width="542" SelectionChanged="inclusao_cmbEnderecos_SelectionChanged" />
 
                             <Label Content="Endereços cadastrados:" HorizontalAlignment="Left" Margin="37,10,0,0" VerticalAlignment="Top"/>
-                            <CheckBox Content="O endereço não está cadastrado" HorizontalAlignment="Left" Margin="171,39,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
+                            <CheckBox x:Name="inclusao_chkEndereco" Content="O endereço não está cadastrado" HorizontalAlignment="Left" Margin="171,39,0,0" VerticalAlignment="Top" Click="CheckBox_Click"/>
                         </Grid>
                     </GroupBox>
                     <GroupBox x:Name="inclusao_nao_membros" Header="Não Membros" Grid.Row="2" Margin="10,10,10,0" Height="255" VerticalAlignment="Top">
                         <Grid>
-                            <Label Content="Nome:" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top"/>
-                            <TextBox x:Name="inclusao_naoMembro_txtNome" HorizontalAlignment="Left" Margin="60,16,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" Width="277"/>
-                            <Label Content="Data de Nascimento:" HorizontalAlignment="Left" Margin="387,10,0,0" VerticalAlignment="Top"/>
-                            <DatePicker Name="inclusao_naoMembros_dpDtNasc" HorizontalAlignment="Left" Margin="512,14,0,0" VerticalAlignment="Top"/>
-                            <DataGrid x:Name="inclusao_naoMembros_dgNaoMembros" 
-                                      AutoGenerateColumns="False" 
-                                      HorizontalAlignment="Left" 
-                                      Height="179" Margin="10,43,0,0" 
+                            <TextBox x:Name="inclusao_txtPesquisarNaoMembro" 
+                                     HorizontalAlignment="Left"   
+                                     Margin="10,10,0,0" 
+                                     Width="327" 
+                                     ToolTip="Pesquisar" 
+                                     TextChanged="inclusao_txtPesquisarNaoMembro_TextChanged" 
+                                     Height="18" VerticalAlignment="Top"/>
+                            <CheckBox x:Name="inclusao_ChkNaoMembro" 
+                                      Margin="359,10,0,0" 
+                                      Height="18" 
                                       VerticalAlignment="Top" 
-                                      Width="640">
+                                      Width="200" 
+                                      HorizontalAlignment="Left" 
+                                      Content="Não membro não cadastrado" Click="inclusao_ChkNaoMembro_Click"/>
+                            <DataGrid x:Name="inclusao_naoMembros_dgNaoMembros" 
+                                      AutoGenerateColumns="False"
+                                      HorizontalAlignment="Left" 
+                                      Height="146" Margin="10,33,0,0" 
+                                      VerticalAlignment="Top" 
+                                      Width="815"
+                                      CanUserAddRows="False"
+                                      CanUserDeleteRows="False">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="Nome" Binding="{Binding Nome}"/>
                                     <DataGridTextColumn Header="Data de Nascimento" Binding="{Binding DataNasc, StringFormat=\{0:dd/MM/yyyy\}}"/>
                                 </DataGrid.Columns>
                             </DataGrid>
-                            <Button x:Name="inclusao_naoMembros_adicionar" Content="Adicionar Não Membro" HorizontalAlignment="Left" Height="21" Margin="671,43,0,0" VerticalAlignment="Top" Width="154" Click="inclusao_naoMembros_adicionar_Click"/>
+
+                            <Label Content="Nome:" HorizontalAlignment="Left" Margin="10,189,0,0" VerticalAlignment="Top"/>
+                            <TextBox x:Name="inclusao_naoMembro_txtNome" 
+                                     HorizontalAlignment="Left" 
+                                     Margin="60,194,0,0" 
+                                     Text="" 
+                                     TextWrapping="Wrap" 
+                                     VerticalAlignment="Top" 
+                                     Width="277" 
+                                     IsEnabled="False"/>
+                            <Label Content="Data de Nascimento:" HorizontalAlignment="Left" Margin="387,193,0,0" VerticalAlignment="Top"/>
+                            <DatePicker Name="inclusao_naoMembros_dpDtNasc" 
+                                        HorizontalAlignment="Left" 
+                                        Margin="512,194,0,0" 
+                                        VerticalAlignment="Top" 
+IsEnabled="False"/>
+                            <Button x:Name="inclusao_naoMembros_adicionar" Content="Adicionar Não Membro" HorizontalAlignment="Left" Height="21" Margin="671,195,0,0" VerticalAlignment="Top" Width="154" Click="inclusao_naoMembros_adicionar_Click"/>
                         </Grid>
                     </GroupBox>
                     <Button Content="Incluir Membro" Name="btnIncluir" Margin="15,283,773,0" Grid.Row="2" VerticalAlignment="Top" Click="btnIncluir_Click" Height="20"/>
