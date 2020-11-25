@@ -24,6 +24,7 @@ namespace FichaIbbv
         private IEnderecosService _enderecosService;
         private INaoMembroService _naoMembroService;
         private IMembros_NaoMembrosService _membros_NaoMembrosService;
+        private MembrosModel altMembro = new MembrosModel();
 
         private List<NaoMembrosModel> lstNaoMembros = new List<NaoMembrosModel>();
 
@@ -101,7 +102,7 @@ namespace FichaIbbv
                 textBox.Clear();
             }
 
-            foreach(TextBox textBox in FindInVisualTreeDown(this.inclusao_dados, typeof(TextBox)))
+            foreach (TextBox textBox in FindInVisualTreeDown(this.inclusao_dados, typeof(TextBox)))
             {
                 textBox.Clear();
             }
@@ -147,7 +148,7 @@ namespace FichaIbbv
                 checkBox.IsChecked = false;
             }
 
-            foreach (ComboBox combo in FindInVisualTreeDown(this.inclusao_endereco,typeof(ComboBox)))
+            foreach (ComboBox combo in FindInVisualTreeDown(this.inclusao_endereco, typeof(ComboBox)))
             {
                 combo.SelectedIndex = -1;
             }
@@ -188,6 +189,11 @@ namespace FichaIbbv
         private void btnIncluir_Click(object sender, RoutedEventArgs e)
         {
             MembrosModel novoMembro = new MembrosModel();
+
+            if(altMembro != null)
+            {
+                novoMembro.IdMembros = altMembro.IdMembros;
+            }
 
             if (inclusao_dtBatismo.SelectedDate != null)
             {
@@ -240,7 +246,7 @@ namespace FichaIbbv
             }
             else
             {
-                if(inclusao_naoMembros_dgNaoMembros.SelectedItems.Count > 0)
+                if (inclusao_naoMembros_dgNaoMembros.SelectedItems.Count > 0)
                 {
                     foreach (NaoMembrosModel nm in inclusao_naoMembros_dgNaoMembros.SelectedItems)
                     {
@@ -371,8 +377,30 @@ namespace FichaIbbv
             {
                 inclusao_naoMembros_dgNaoMembros.ItemsSource = lstNaoMembros;
                 inclusao_naoMembros_dgNaoMembros.IsEnabled = false;
-
             }
+        }
+
+        private void btnAtualizarMembro_Click(object sender, RoutedEventArgs e)
+        {
+            MembrosModel selMembro = (MembrosModel)dgMembros.SelectedItem;
+
+            inclusao_txtNome.Text = selMembro.Nome;
+            inclusao_dtNasc.SelectedDate = selMembro.DataNasc;
+            inclusao_txtTel.Text = selMembro.Telefone;
+            inclusao_txtEmail.Text = selMembro.Email;
+            inclusao_txtRG.Text = selMembro.Rg;
+            altMembro = selMembro;
+
+            if (selMembro.DataBatismo != DateTime.MinValue)
+            {
+                inclusao_dtBatismo.SelectedDate = selMembro.DataBatismo;
+            }
+
+            EnderecosModel end = _enderecosService.GetById(selMembro.IdEnderecos);
+
+            inclusao_cmbEnderecos.SelectedValue = selMembro.IdEnderecos;
+
+            tbCtrl.SelectedIndex = 1;
         }
     }
 }
