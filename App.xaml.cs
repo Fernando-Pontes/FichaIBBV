@@ -1,6 +1,11 @@
 ﻿using FichaIBBV.Services;
 using FichaIBBV.Services.Abstract;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Configuration;
+using System.IO;
 using System.Windows;
 
 namespace FichaIbbv
@@ -23,15 +28,24 @@ namespace FichaIbbv
 
         private void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<MainWindow>()
+
+
+
+            _ = services.AddSingleton<MainWindow>()
                .AddScoped<IMembrosService, MembrosService>()
                .AddScoped<IEnderecosService, EnderecosService>()
                .AddScoped<INaoMembroService, NaoMembroService>()
                .AddScoped<IMembros_NaoMembrosService, Membros_NaoMembrosService>();
+
+            var configuration = new ConfigurationBuilder()
+               .SetBasePath(Directory.GetParent(AppContext.BaseDirectory).FullName)
+               .AddJsonFile("appsettings.json")
+               .Build();
         }
 
         private void OnStartup(object sender, StartupEventArgs e)
         {
+
             var mainWindow = _serviceProvider.GetService<MainWindow>();
             mainWindow.Show();
         }
